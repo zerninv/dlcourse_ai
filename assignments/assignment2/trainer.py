@@ -23,11 +23,7 @@ class Trainer:
     training parameters and optimization rule
     """
 
-    def __init__(self, model, dataset, optim,
-                 num_epochs=20,
-                 batch_size=20,
-                 learning_rate=1e-3,
-                 learning_rate_decay=1.0):
+    def __init__(self, model, dataset, optim, num_epochs=20, batch_size=20, learning_rate=1e-3, learning_rate_decay=1.):
         """
         Initializes the trainer
 
@@ -86,7 +82,7 @@ class Trainer:
         loss_history = []
         train_acc_history = []
         val_acc_history = []
-        
+
         for epoch in range(self.num_epochs):
             shuffled_indices = np.arange(num_train)
             np.random.shuffle(shuffled_indices)
@@ -96,12 +92,9 @@ class Trainer:
             batch_losses = []
 
             for batch_indices in batches_indices:
-                # TODO Generate batches based on batch_indices and
-                # use model to generate loss and gradients for all
-                # the params
-
-                raise Exception("Not implemented!")
-
+                train_X = self.dataset.train_X[batch_indices]
+                train_y = self.dataset.train_y[batch_indices]
+                loss = self.model.compute_loss_and_gradients(train_X, train_y)
                 for param_name, param in self.model.params().items():
                     optimizer = self.optimizers[param_name]
                     param.value = optimizer.update(param.value, param.grad, self.learning_rate)
@@ -109,19 +102,15 @@ class Trainer:
                 batch_losses.append(loss)
 
             if np.not_equal(self.learning_rate_decay, 1.0):
-                # TODO: Implement learning rate decay
-                raise Exception("Not implemented!")
+                self.learning_rate *= self.learning_rate_decay
 
             ave_loss = np.mean(batch_losses)
 
-            train_accuracy = self.compute_accuracy(self.dataset.train_X,
-                                                   self.dataset.train_y)
+            train_accuracy = self.compute_accuracy(self.dataset.train_X, self.dataset.train_y)
 
-            val_accuracy = self.compute_accuracy(self.dataset.val_X,
-                                                 self.dataset.val_y)
+            val_accuracy = self.compute_accuracy(self.dataset.val_X, self.dataset.val_y)
 
-            print("Loss: %f, Train accuracy: %f, val accuracy: %f" %
-                  (batch_losses[-1], train_accuracy, val_accuracy))
+            print("Loss: %f, Train accuracy: %f, val accuracy: %f" % (batch_losses[-1], train_accuracy, val_accuracy))
 
             loss_history.append(ave_loss)
             train_acc_history.append(train_accuracy)

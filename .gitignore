@@ -1,1 +1,6 @@
 .DS_Store
+venv
+.idea
+assignments/assignment*/data
+assignments/assignment*/__pycache__
+assignments/assignment*/.pynb_checkpoints
